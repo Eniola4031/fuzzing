@@ -2,11 +2,16 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import  "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 
 
 contract StakingContract {
+            IERC20 public immutable stakingToken;
 
-        IERC20 public immutable stakingToken;
+    constructor(address _stakingTokenAddr) {
+        stakingToken = IERC20(_stakingTokenAddr);
+    }
        // IERC20 public immutable rewardsToken;
 
 
@@ -23,14 +28,14 @@ contract StakingContract {
     event RewardsClaimed(address indexed user, uint256 amount);
 
     // Function to stake tokens
-    function stake(uint256 amount) external payable{
+    function stake(uint256 amount) external {
         require(amount > 0, "Amount must be greater than zero");
         // Update staking balances
         stakedBalance[msg.sender] += amount;
         totalStaked += amount;
         lastStakeTime[msg.sender] = block.timestamp;
         // Transfer tokens from user to contract
-        stakingToken.transferFrom(msg.sender,address(this), amount);
+        stakingToken.transferFrom(msg.sender, address(this), amount);
 
         emit Staked(msg.sender, amount);
     }
@@ -81,4 +86,12 @@ contract StakingContract {
 
         return rewards;
     }
+}
+contract UtitlityToken is ERC20 {  
+    constructor(string memory _tokenName, string memory _tokenSymbol, uint _decimal)
+     ERC20(_tokenName, _tokenSymbol) {}  
+
+           function mint(address user, uint256 amount) public {
+            _mint(user, amount);    
+            }
 }
